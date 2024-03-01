@@ -1,12 +1,12 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.8.0"
+    id("org.jetbrains.intellij") version "1.17.2"
 
-    kotlin("jvm") version "1.9.10"
+    kotlin("jvm") version "1.8.20"
 }
 
-group = "com.videogameaholic"
-version = "0.230912"
+group = "com.codeplugin"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
@@ -15,21 +15,22 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2021.2")
-    type.set("IC") // Target IDE Platform
-
-    plugins.set(listOf(/* Plugin Dependencies */))
+    version.set("2023.2")
+    type.set("IC")
+    plugins.set(listOf())
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain({
+        17
+    })
 }
 
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
     }
 
     patchPluginXml {

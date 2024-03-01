@@ -41,6 +41,7 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
 
     public static final Key<String[]> STAR_CODER_CODE_SUGGESTION = new Key<>("StarCoder Code Suggestion");
     public static final Key<Integer> STAR_CODER_POSITION = new Key<>("StarCoder Position");
+    private static final String SWING_FOCUS_OWNER_PROPERTY = "SwingFocusOwner";
 
     private MergingUpdateQueue serviceQueue;
 

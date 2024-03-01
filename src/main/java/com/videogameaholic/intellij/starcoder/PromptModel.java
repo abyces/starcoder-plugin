@@ -1,8 +1,8 @@
 package com.videogameaholic.intellij.starcoder;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.stream.Stream;
 
 public enum PromptModel {
