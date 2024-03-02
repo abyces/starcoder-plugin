@@ -11,6 +11,7 @@ import com.videogameaholic.intellij.starcoder.domain.enums.PromptModel;
 import com.videogameaholic.intellij.starcoder.settings.BaseModelSettings;
 import com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings;
 import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
+import groovy.util.logging.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -24,6 +25,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.util.Optional;
 
+@Slf4j
 public class StarCoderService {
 
     private int statusCode = 200;

@@ -86,10 +86,10 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <editorOptionsProvider instance="com.videogameaholic.intellij.starcoder.settings.StarCoderSettingsProvider"/>
+        <editorOptionsProvider instance="com.videogameaholic.intellij.starcoder.settings.DeepSeekSettingsProvider"/>
 
         <applicationService serviceImplementation="com.videogameaholic.intellij.starcoder.StarCoderService"/>
-        <applicationService serviceImplementation="com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings"/>
+        <applicationService serviceImplementation="com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings"/>
 
         <statusBarWidgetFactory id="StarCoderFactory"
                                 implementation="com.videogameaholic.intellij.starcoder.StarCoderWidgetFactory"

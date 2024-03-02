@@ -7,9 +7,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.videogameaholic.intellij.starcoder.StarCoderService;
+import groovy.util.logging.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+@Slf4j
 public class CodeGenPromptAction extends AnAction {
 
     @Override

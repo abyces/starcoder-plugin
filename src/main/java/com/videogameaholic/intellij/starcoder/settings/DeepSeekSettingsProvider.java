@@ -11,6 +11,7 @@ import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.wm.WindowManager;
 import com.videogameaholic.intellij.starcoder.StarCoderWidget;
 import com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings;
+import groovy.util.logging.Slf4j;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
+@Slf4j
 public class DeepSeekSettingsProvider implements EditorOptionsProvider {
     private SettingsPanel settingsPanel;
 

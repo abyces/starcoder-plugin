@@ -14,10 +14,12 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.ui.paint.EffectPainter
 import com.intellij.util.ui.GraphicsUtil
 import com.intellij.util.ui.UIUtil
+import groovy.util.logging.Slf4j
 import java.awt.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+@Slf4j
 open class CodeGenHintRenderer(var text: String?) : EditorCustomElementRenderer {
 
     override fun calcWidthInPixels(inlay: Inlay<*>): Int {

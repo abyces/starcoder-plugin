@@ -24,6 +24,7 @@ import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.videogameaholic.intellij.starcoder.domain.enums.StarCoderStatus;
 import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
+import groovy.util.logging.Slf4j;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +36,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 
+@Slf4j
 public class StarCoderWidget extends EditorBasedWidget
 implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
         CaretListener, SelectionListener, BulkAwareDocumentListener.Simple, PropertyChangeListener {

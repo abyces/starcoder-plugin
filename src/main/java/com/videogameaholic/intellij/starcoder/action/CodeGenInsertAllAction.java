@@ -8,10 +8,12 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.videogameaholic.intellij.starcoder.StarCoderWidget;
+import groovy.util.logging.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.StringJoiner;
 
+@Slf4j
 public class CodeGenInsertAllAction extends AnAction {
 
     @Override

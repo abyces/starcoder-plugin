@@ -9,9 +9,11 @@ import com.intellij.openapi.editor.actionSystem.EditorWriteActionHandler;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
 import com.videogameaholic.intellij.starcoder.domain.enums.TabActionOption;
+import groovy.util.logging.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Slf4j
 public class CodeGenTabAction  extends EditorWriteActionHandler {
     protected final EditorActionHandler myOriginalHandler;
 
