@@ -7,7 +7,10 @@ import com.google.gson.JsonSyntaxException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.WindowManager;
-import com.videogameaholic.intellij.starcoder.settings.StarCoderSettings;
+import com.videogameaholic.intellij.starcoder.domain.enums.PromptModel;
+import com.videogameaholic.intellij.starcoder.settings.BaseModelSettings;
+import com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings;
+import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -26,8 +29,7 @@ public class StarCoderService {
     private int statusCode = 200;
 
     public String[] getCodeCompletionHints(CharSequence editorContents, int cursorPosition) {
-        StarCoderSettings settings = StarCoderSettings.getInstance();
-        if(!settings.isSaytEnabled()) return null;
+        DeepSeekSettings settings = DeepSeekSettings.getInstance();
 
         PromptModel fimModel = settings.getFimTokenModel();
         String starCoderPrompt = fimModel.generateFIMPrompt("",editorContents.toString(),cursorPosition);
@@ -38,7 +40,7 @@ public class StarCoderService {
         return fimModel.buildSuggestionList(generatedText);
     }
 
-    private HttpPost buildApiPost (StarCoderSettings settings, String starCoderPrompt) {
+    private HttpPost buildApiPost (BaseModelSettings settings, String starCoderPrompt) {
         String apiURL = settings.getApiURL();
         String bearerToken = settings.getApiToken();
         float temperature = settings.getTemperature();

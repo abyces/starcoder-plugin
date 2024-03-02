@@ -1,4 +1,4 @@
-package com.videogameaholic.intellij.starcoder;
+package com.videogameaholic.intellij.starcoder.domain.enums;
 
 import java.util.stream.Stream;
 

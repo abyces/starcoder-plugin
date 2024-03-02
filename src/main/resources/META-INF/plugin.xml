@@ -89,7 +89,7 @@
         <editorOptionsProvider instance="com.videogameaholic.intellij.starcoder.settings.StarCoderSettingsProvider"/>
 
         <applicationService serviceImplementation="com.videogameaholic.intellij.starcoder.StarCoderService"/>
-        <applicationService serviceImplementation="com.videogameaholic.intellij.starcoder.settings.StarCoderSettings"/>
+        <applicationService serviceImplementation="com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings"/>
 
         <statusBarWidgetFactory id="StarCoderFactory"
                                 implementation="com.videogameaholic.intellij.starcoder.StarCoderWidgetFactory"

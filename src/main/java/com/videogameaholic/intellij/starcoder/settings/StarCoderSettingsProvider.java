@@ -10,6 +10,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.wm.WindowManager;
 import com.videogameaholic.intellij.starcoder.StarCoderWidget;
+import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

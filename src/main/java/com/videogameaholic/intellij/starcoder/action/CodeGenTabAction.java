@@ -7,8 +7,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.openapi.editor.actionSystem.EditorWriteActionHandler;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.videogameaholic.intellij.starcoder.settings.StarCoderSettings;
-import com.videogameaholic.intellij.starcoder.settings.TabActionOption;
+import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
+import com.videogameaholic.intellij.starcoder.domain.enums.TabActionOption;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

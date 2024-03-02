@@ -1,7 +1,8 @@
 package com.videogameaholic.intellij.starcoder.settings;
 
 import com.intellij.ui.EnumComboBoxModel;
-import com.videogameaholic.intellij.starcoder.PromptModel;
+import com.videogameaholic.intellij.starcoder.domain.enums.PromptModel;
+import com.videogameaholic.intellij.starcoder.domain.enums.TabActionOption;
 
 import javax.swing.*;
 

@@ -1,4 +1,4 @@
-package com.videogameaholic.intellij.starcoder.settings;
+package com.videogameaholic.intellij.starcoder.domain.enums;
 
 public enum TabActionOption {
     // TODO add action class here?

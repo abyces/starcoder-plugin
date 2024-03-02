@@ -10,6 +10,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.wm.WindowManager;
 import com.videogameaholic.intellij.starcoder.StarCoderWidget;
+import com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +46,6 @@ public class DeepSeekSettingsProvider implements EditorOptionsProvider {
         return !savedSettings.getApiURL().equals(settingsPanel.getApiUrl())
                 || !savedSettings.getApiToken().equals(settingsPanel.getApiToken())
                 || savedSettings.getTabActionOption() != settingsPanel.getTabActionOption()
-                || savedSettings.isSaytEnabled() != settingsPanel.getEnableSAYTCheckBox()
                 || savedSettings.getTemperature() != Float.parseFloat(settingsPanel.getTemperature())
                 || savedSettings.getMaxNewTokens() != Integer.parseInt(settingsPanel.getMaxNewTokens())
                 || savedSettings.getTopP() != Float.parseFloat(settingsPanel.getTopP())
@@ -59,7 +59,6 @@ public class DeepSeekSettingsProvider implements EditorOptionsProvider {
 
         savedSettings.setApiURL(settingsPanel.getApiUrl());
         savedSettings.setApiToken(settingsPanel.getApiToken());
-        savedSettings.setSaytEnabled(settingsPanel.getEnableSAYTCheckBox());
         savedSettings.setTabActionOption(settingsPanel.getTabActionOption());
         savedSettings.setTemperature(settingsPanel.getTemperature());
         savedSettings.setMaxNewTokens(settingsPanel.getMaxNewTokens());
@@ -92,7 +91,6 @@ public class DeepSeekSettingsProvider implements EditorOptionsProvider {
 
         settingsPanel.setApiUrl(savedSettings.getApiURL());
         settingsPanel.setApiToken(savedSettings.getApiToken());
-        settingsPanel.setEnableSAYTCheckBox(savedSettings.isSaytEnabled());
         settingsPanel.setTabActionOption(savedSettings.getTabActionOption());
         settingsPanel.setTemperature(String.valueOf(savedSettings.getTemperature()));
         settingsPanel.setMaxNewTokens(String.valueOf(savedSettings.getMaxNewTokens()));
