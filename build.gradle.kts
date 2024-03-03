@@ -12,6 +12,11 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation("com.alibaba.fastjson2:fastjson2:2.0.47");
+    testImplementation("ch.qos.logback:logback-classic:1.4.14")
+}
+
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {

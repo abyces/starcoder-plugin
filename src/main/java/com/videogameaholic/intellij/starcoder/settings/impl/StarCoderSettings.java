@@ -24,7 +24,9 @@ public class StarCoderSettings implements BaseModelSettings, PersistentStateComp
     private static final String TEMPERATURE_TAG = "TEMPERATURE";
     private static final String MAX_NEW_TOKENS_TAG = "MAX_NEW_TOKENS";
     private static final String TOP_P_TAG = "TOP_P";
-    private static final String REPEAT_PENALTY_TAG = "REPEAT_PENALTY";
+    private static final String REPEAT_PENALTY_TAG = "REPEAT_PENALTY_TAG";
+    private static final String FREQUENCY_PENALTY_TAG = "FREQUENCY_PENALTY";
+    private static final String PRESENCE_PENALTY_TAG = "PRESENCE_PENALTY";
     private static final String FIM_MODEL_TAG = "FIM_TOKEN_MODEL";
 
     private boolean saytEnabled = true;
@@ -167,5 +169,30 @@ public class StarCoderSettings implements BaseModelSettings, PersistentStateComp
 
     public void setFimTokenModel(PromptModel fimTokenModel){
         this.fimTokenModel=fimTokenModel;
+    }
+
+    @Override
+    public String getModel() {
+        return null;
+    }
+
+    @Override
+    public String getMessages() {
+        return null;
+    }
+
+    @Override
+    public int getMaxTokens() {
+        return getMaxNewTokens();
+    }
+
+    @Override
+    public float getFrequencyPenalty() {
+        return 0;
+    }
+
+    @Override
+    public float getPresencePenalty() {
+        return 0;
     }
 }

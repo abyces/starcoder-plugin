@@ -7,9 +7,17 @@ public interface BaseModelSettings {
 
     public float getTemperature();
 
-    public int getMaxNewTokens();
+    public int getMaxTokens();
 
     public float getTopP();
 
+    public float getFrequencyPenalty();
+
+    public float getPresencePenalty();
+
     public float getRepetitionPenalty();
+
+    public String getModel();
+
+    public String getMessages();
 }

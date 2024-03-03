@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.openapi.editor.actionSystem.EditorWriteActionHandler;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings;
 import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
 import com.videogameaholic.intellij.starcoder.domain.enums.TabActionOption;
 import groovy.util.logging.Slf4j;
@@ -30,7 +31,7 @@ public class CodeGenTabAction  extends EditorWriteActionHandler {
 
     private boolean insertCodeSuggestion(Editor editor, Caret caret, DataContext dataContext) {
         VirtualFile file = dataContext.getData(CommonDataKeys.VIRTUAL_FILE);
-        TabActionOption tabActionOption = StarCoderSettings.getInstance().getTabActionOption();
+        TabActionOption tabActionOption = DeepSeekSettings.getInstance().getTabActionOption();
 
         switch (tabActionOption) {
             case ALL:

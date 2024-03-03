@@ -49,10 +49,11 @@ public class DeepSeekSettingsProvider implements EditorOptionsProvider {
                 || !savedSettings.getApiToken().equals(settingsPanel.getApiToken())
                 || savedSettings.getTabActionOption() != settingsPanel.getTabActionOption()
                 || savedSettings.getTemperature() != Float.parseFloat(settingsPanel.getTemperature())
-                || savedSettings.getMaxNewTokens() != Integer.parseInt(settingsPanel.getMaxNewTokens())
+                || savedSettings.getMaxTokens() != Integer.parseInt(settingsPanel.getMaxNewTokens())
                 || savedSettings.getTopP() != Float.parseFloat(settingsPanel.getTopP())
-                || savedSettings.getRepetitionPenalty() != Float.parseFloat(settingsPanel.getRepetition())
-                ||!savedSettings.getFimTokenModel().equals(settingsPanel.getFimTokenModel());
+                || savedSettings.getFrequencyPenalty() != Float.parseFloat(settingsPanel.getRepetition())
+                || savedSettings.getPresencePenalty() != Float.parseFloat(settingsPanel.getRepetition())
+                || !savedSettings.getFimTokenModel().equals(settingsPanel.getFimTokenModel());
     }
 
     @Override
@@ -63,9 +64,10 @@ public class DeepSeekSettingsProvider implements EditorOptionsProvider {
         savedSettings.setApiToken(settingsPanel.getApiToken());
         savedSettings.setTabActionOption(settingsPanel.getTabActionOption());
         savedSettings.setTemperature(settingsPanel.getTemperature());
-        savedSettings.setMaxNewTokens(settingsPanel.getMaxNewTokens());
+        savedSettings.setMaxTokens(settingsPanel.getMaxNewTokens());
         savedSettings.setTopP(settingsPanel.getTopP());
-        savedSettings.setRepetitionPenalty(settingsPanel.getRepetition());
+        savedSettings.setFrequencyPenalty(settingsPanel.getRepetition());
+        savedSettings.setPresencePenalty(settingsPanel.getRepetition());
         savedSettings.setFimTokenModel(settingsPanel.getFimTokenModel());
         if(settingsPanel.getApiToken().isBlank()){
             Project[] projects = ProjectManager.getInstance().getOpenProjects();
@@ -95,9 +97,9 @@ public class DeepSeekSettingsProvider implements EditorOptionsProvider {
         settingsPanel.setApiToken(savedSettings.getApiToken());
         settingsPanel.setTabActionOption(savedSettings.getTabActionOption());
         settingsPanel.setTemperature(String.valueOf(savedSettings.getTemperature()));
-        settingsPanel.setMaxNewTokens(String.valueOf(savedSettings.getMaxNewTokens()));
+        settingsPanel.setMaxNewTokens(String.valueOf(savedSettings.getMaxTokens()));
         settingsPanel.setTopP(String.valueOf(savedSettings.getTopP()));
-        settingsPanel.setRepetition(String.valueOf(savedSettings.getRepetitionPenalty()));
+        settingsPanel.setRepetition(String.valueOf(savedSettings.getFrequencyPenalty()));
         settingsPanel.setFimTokenModel(savedSettings.getFimTokenModel());
     }
 }

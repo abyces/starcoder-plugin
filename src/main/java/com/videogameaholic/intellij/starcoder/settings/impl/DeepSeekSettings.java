@@ -21,22 +21,24 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
     private static final CredentialAttributes CREDENTIAL_ATTRIBUTES = new CredentialAttributes(DeepSeekSettings.class.getName(), "DS_BEARER_TOKEN");
     private static final String TAB_ACTION_TAG = "TAB_ACTION";
     private static final String TEMPERATURE_TAG = "TEMPERATURE";
-    private static final String MAX_NEW_TOKENS_TAG = "MAX_NEW_TOKENS";
+    private static final String MAX_TOKENS_TAG = "MAX_TOKENS";
     private static final String TOP_P_TAG = "TOP_P";
-    private static final String REPEAT_PENALTY_TAG = "REPEAT_PENALTY";
+    private static final String FREQUENCY_PENALTY_TAG = "FREQUENCY_PENALTY";
+    private static final String PRESENCE_PENALTY_TAG = "PRESENCE_PENALTY";
     private static final String FIM_MODEL_TAG = "FIM_TOKEN_MODEL";
     private static final String MODEL = "MODEL";
-    private static final String MESSAGE = "DIALOGUE";
+    private static final String MESSAGES = "DIALOGUE";
 
     private String apiURL = "https://api.deepseek.com/v1/chat/completions";
     private TabActionOption tabActionOption = TabActionOption.ALL;
-    private float temperature = 0.2f;
-    private int maxNewTokens = 256;
+    private float temperature = 1.0f;
+    private int maxTokens = 2048;
     private float topP = 0.9f;
-    private float repetitionPenalty = 1.2f;
+    private float frequencyPenalty = 0f;
+    private float presencePenalty = 0f;
     private PromptModel fimTokenModel = PromptModel.DEEPSEEK;
     private String model = "deepseek-coder";
-    private String message = "[\n{\"role\": \"system\", \"content\": \"You are a helpful assistant.\"},\n{\"role\": \"user\", \"content\": \"{}\"}]";
+    private String messages = "[\n{\"role\": \"system\", \"content\": \"You are a helpful assistant, fill the <fim_hole> with correct code and just return these replaced code.\"},\n{\"role\": \"user\", \"content\": \"<PLACEHOLDER>\"}]";
 
 
     private static final DeepSeekSettings deepSeekSettingsInstance = new DeepSeekSettings();
@@ -47,12 +49,13 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
         state.setAttribute(API_URL_TAG, getApiURL());
         state.setAttribute(TAB_ACTION_TAG, getTabActionOption().name());
         state.setAttribute(TEMPERATURE_TAG, String.valueOf(getTemperature()));
-        state.setAttribute(MAX_NEW_TOKENS_TAG, String.valueOf(getMaxNewTokens()));
+        state.setAttribute(MAX_TOKENS_TAG, String.valueOf(getMaxTokens()));
         state.setAttribute(TOP_P_TAG, String.valueOf(getTopP()));
-        state.setAttribute(REPEAT_PENALTY_TAG, String.valueOf(getRepetitionPenalty()));
+        state.setAttribute(FREQUENCY_PENALTY_TAG, String.valueOf(getFrequencyPenalty()));
+        state.setAttribute(PRESENCE_PENALTY_TAG, String.valueOf(getPresencePenalty()));
         state.setAttribute(FIM_MODEL_TAG, getFimTokenModel().getId());
         state.setAttribute(MODEL, getModel());
-        state.setAttribute(MESSAGE, getMessage());
+        state.setAttribute(MESSAGES, getMessages());
         return state;
     }
 
@@ -67,14 +70,17 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
         if(state.getAttributeValue(TEMPERATURE_TAG)!=null){
             setTemperature(state.getAttributeValue(TEMPERATURE_TAG));
         }
-        if(state.getAttributeValue(MAX_NEW_TOKENS_TAG)!=null){
-            setMaxNewTokens(state.getAttributeValue(MAX_NEW_TOKENS_TAG));
+        if(state.getAttributeValue(MAX_TOKENS_TAG)!=null){
+            setMaxTokens(state.getAttributeValue(MAX_TOKENS_TAG));
         }
         if(state.getAttributeValue(TOP_P_TAG)!=null){
             setTopP(state.getAttributeValue(TOP_P_TAG));
         }
-        if(state.getAttributeValue(REPEAT_PENALTY_TAG)!=null){
-            setRepetitionPenalty(state.getAttributeValue(REPEAT_PENALTY_TAG));
+        if(state.getAttributeValue(FREQUENCY_PENALTY_TAG)!=null){
+            setFrequencyPenalty(state.getAttributeValue(FREQUENCY_PENALTY_TAG));
+        }
+        if(state.getAttributeValue(PRESENCE_PENALTY_TAG)!=null){
+            setPresencePenalty(state.getAttributeValue(PRESENCE_PENALTY_TAG));
         }
         if(state.getAttributeValue(FIM_MODEL_TAG)!=null){
             setFimTokenModel(PromptModel.fromId(state.getAttributeValue(FIM_MODEL_TAG)));
@@ -82,8 +88,8 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
         if(state.getAttributeValue(MODEL)!=null){
             setModel(state.getAttributeValue(MODEL));
         }
-        if(state.getAttributeValue(MESSAGE)!=null){
-            setMessage(state.getAttributeValue(MESSAGE));
+        if(state.getAttributeValue(MESSAGES)!=null){
+            setMessages(state.getAttributeValue(MESSAGES));
         }
     }
 
@@ -99,6 +105,16 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
         return service;
     }
 
+    public void setApiToken(String apiToken) {
+        PasswordSafe.getInstance().set(CREDENTIAL_ATTRIBUTES, new Credentials(null, apiToken));
+    }
+
+    @Override
+    public String getApiToken() {
+        Credentials credentials = PasswordSafe.getInstance().get(CREDENTIAL_ATTRIBUTES);
+        return credentials != null ? credentials.getPasswordAsString() : "";
+    }
+
     @Override
     public String getApiURL() {
         return apiURL;
@@ -108,14 +124,12 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
         this.apiURL = apiURL;
     }
 
-    @Override
-    public String getApiToken() {
-        Credentials credentials = PasswordSafe.getInstance().get(CREDENTIAL_ATTRIBUTES);
-        return credentials != null ? credentials.getPasswordAsString() : "";
+    public TabActionOption getTabActionOption() {
+        return tabActionOption;
     }
 
-    public void setApiToken(String apiToken) {
-        PasswordSafe.getInstance().set(CREDENTIAL_ATTRIBUTES, new Credentials(null, apiToken));
+    public void setTabActionOption(TabActionOption tabActionOption) {
+        this.tabActionOption = tabActionOption;
     }
 
     @Override
@@ -128,12 +142,12 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
     }
 
     @Override
-    public int getMaxNewTokens() {
-        return maxNewTokens;
+    public int getMaxTokens() {
+        return maxTokens;
     }
 
-    public void setMaxNewTokens(String maxNewTokens) {
-        this.maxNewTokens = Integer.parseInt(maxNewTokens);
+    public void setMaxTokens(String maxTokens) {
+        this.maxTokens = Integer.parseInt(maxTokens);
     }
 
     @Override
@@ -146,30 +160,32 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
     }
 
     @Override
-    public float getRepetitionPenalty() {
-        return repetitionPenalty;
+    public float getFrequencyPenalty() {
+        return frequencyPenalty;
     }
 
-    public void setRepetitionPenalty(String repetitionPenalty) {
-        this.repetitionPenalty = Float.parseFloat(repetitionPenalty);
+    public void setFrequencyPenalty(String frequencyPenalty) {
+        this.frequencyPenalty = Float.parseFloat(frequencyPenalty);
     }
 
-    public TabActionOption getTabActionOption() {
-        return tabActionOption;
+    @Override
+    public float getPresencePenalty() {
+        return presencePenalty;
     }
 
-    public void setTabActionOption(TabActionOption tabActionOption) {
-        this.tabActionOption = tabActionOption;
+    public void setPresencePenalty(String presencePenalty) {
+        this.presencePenalty = Float.parseFloat(presencePenalty);
     }
 
-    public PromptModel getFimTokenModel(){
+    public PromptModel getFimTokenModel() {
         return fimTokenModel;
     }
 
-    public void setFimTokenModel(PromptModel fimTokenModel){
-        this.fimTokenModel=fimTokenModel;
+    public void setFimTokenModel(PromptModel fimTokenModel) {
+        this.fimTokenModel = fimTokenModel;
     }
 
+    @Override
     public String getModel() {
         return model;
     }
@@ -178,12 +194,41 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
         this.model = model;
     }
 
-    public String getMessage() {
-        return message;
+    @Override
+    public String getMessages() {
+        return messages;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setMessages(String messages) {
+        this.messages = messages;
+    }
+
+    @Override
+    public float getRepetitionPenalty() {
+        return getFrequencyPenalty();
     }
 }
+
+/**
+ * {
+ *   "messages": [
+ *     {
+ *       "content": "You are a helpful assistant, fill the <|fim_hole|> with correct code.",
+ *       "role": "system"
+ *     },
+ *     {
+ *       "content": "def hello_world:\n<｜fim▁hole｜>",
+ *       "role": "user"
+ *     }
+ *   ],
+ *   "model": "deepseek-coder",
+ *   "frequency_penalty": 0,
+ *   "max_tokens": 2048,
+ *   "presence_penalty": 0,
+ *   "stop": null,
+ *   "stream": false,
+ *   "temperature": 1,
+ *   "top_p": 1
+ * }
+ */
 

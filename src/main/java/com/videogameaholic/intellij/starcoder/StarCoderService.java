@@ -1,5 +1,6 @@
 package com.videogameaholic.intellij.starcoder;
 
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -9,6 +10,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.WindowManager;
 import com.videogameaholic.intellij.starcoder.domain.enums.PromptModel;
 import com.videogameaholic.intellij.starcoder.settings.BaseModelSettings;
+import com.videogameaholic.intellij.starcoder.settings.Property;
 import com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings;
 import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
 import groovy.util.logging.Slf4j;
@@ -28,42 +30,56 @@ import java.util.Optional;
 @Slf4j
 public class StarCoderService {
 
+    private Property property;
+
     private int statusCode = 200;
+
+    public StarCoderService() {
+        property = new Property();
+    }
 
     public String[] getCodeCompletionHints(CharSequence editorContents, int cursorPosition) {
         DeepSeekSettings settings = DeepSeekSettings.getInstance();
 
         PromptModel fimModel = settings.getFimTokenModel();
-        String starCoderPrompt = fimModel.generateFIMPrompt("",editorContents.toString(),cursorPosition);
-        if(starCoderPrompt.isEmpty()) return null;
+        String prompt = fimModel.generateChatCompletionPrompt("",editorContents.toString(), cursorPosition);
+        prompt = settings.getMessages().replace("<PLACEHOLDER>", prompt);
+        System.out.println("ChatCompletion Prompt: {}".replace("{}", prompt));
+        if(prompt.isEmpty()) return null;
 
-        HttpPost httpPost = buildApiPost(settings, starCoderPrompt);
+        HttpPost httpPost = buildApiPost(settings, prompt);
         String generatedText = getApiResponse(httpPost);
+        System.out.println(String.format("ChatCompletion Prompt: {}", generatedText));
         return fimModel.buildSuggestionList(generatedText);
     }
 
-    private HttpPost buildApiPost (BaseModelSettings settings, String starCoderPrompt) {
+    private HttpPost buildApiPost (BaseModelSettings settings, String prompt) {
         String apiURL = settings.getApiURL();
         String bearerToken = settings.getApiToken();
         float temperature = settings.getTemperature();
-        int maxNewTokens = settings.getMaxNewTokens();
+        int maxNewTokens = settings.getMaxTokens();
         float topP = settings.getTopP();
-        float repetitionPenalty = settings.getRepetitionPenalty();
+        float frequencyPenalty = settings.getFrequencyPenalty();
+        float presencePenalty = settings.getPresencePenalty();
+        String model = settings.getModel();
 
         HttpPost httpPost = new HttpPost(apiURL);
-        if(!bearerToken.isBlank()) httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken);
-        JsonObject httpBody = new JsonObject();
-        httpBody.addProperty("inputs", starCoderPrompt);
+        if(!bearerToken.isBlank() || bearerToken.isEmpty()) {
+            httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + property.getProperty("ds.token"));
+        }
 
-        JsonObject parameters = new JsonObject();
-        parameters.addProperty("temperature", temperature);
-        parameters.addProperty("max_new_tokens", maxNewTokens);
-        parameters.addProperty("top_p", topP);
-        parameters.addProperty("repetition_penalty", repetitionPenalty);
-        httpBody.add("parameters", parameters);
+        JsonObject httpBody = new JsonObject();
+        httpBody.addProperty("model", model);
+        httpBody.addProperty("messages", prompt);
+        httpBody.addProperty("temperature", temperature);
+        httpBody.addProperty("max_tokens", maxNewTokens);
+        httpBody.addProperty("top_p", topP);
+        httpBody.addProperty("frequency_penalty", frequencyPenalty);
+        httpBody.addProperty("presence_penalty", presencePenalty);
 
         StringEntity requestEntity = new StringEntity(httpBody.toString(), ContentType.APPLICATION_JSON);
         httpPost.setEntity(requestEntity);
+
         return httpPost;
     }
 
@@ -125,7 +141,7 @@ public class StarCoderService {
         // Default to returning the same text.
         String replacement = prompt;
 
-        StarCoderSettings settings = StarCoderSettings.getInstance();
+        DeepSeekSettings settings = DeepSeekSettings.getInstance();
         HttpPost httpPost = buildApiPost(settings, prompt);
         String generatedText = getApiResponse(httpPost);
         if(!StringUtils.isEmpty(generatedText)) {
