@@ -108,8 +108,8 @@ public class StarCoderService {
                 return responseText;
             }
             String responseBody = EntityUtils.toString(response.getEntity());
-            ChatCompletionResponse responseObject = parseChatCompletionResponse(responseBody);
-            responseText = extractGeneratedText(responseObject).orElse("");
+            ChatCompletionResponse chatCompletionResponse = parseChatCompletionResponse(responseBody);
+            responseText = extractGeneratedText(chatCompletionResponse.getChoices()).orElse("");
 
             httpClient.close();
 
