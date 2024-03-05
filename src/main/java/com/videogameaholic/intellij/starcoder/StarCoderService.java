@@ -1,6 +1,9 @@
 package com.videogameaholic.intellij.starcoder;
 
-import com.fasterxml.jackson.jr.ob.JSON;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
+import com.github.weisj.jsvg.S;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -8,6 +11,9 @@ import com.google.gson.JsonSyntaxException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.WindowManager;
+import com.videogameaholic.intellij.starcoder.domain.dto.ChatCompletionResponse;
+import com.videogameaholic.intellij.starcoder.domain.dto.ResponseChoice;
+import com.videogameaholic.intellij.starcoder.domain.dto.ResponseTokenUsage;
 import com.videogameaholic.intellij.starcoder.domain.enums.PromptModel;
 import com.videogameaholic.intellij.starcoder.settings.BaseModelSettings;
 import com.videogameaholic.intellij.starcoder.settings.Property;
@@ -25,7 +31,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 public class StarCoderService {
@@ -57,7 +63,7 @@ public class StarCoderService {
         String apiURL = settings.getApiURL();
         String bearerToken = settings.getApiToken();
         float temperature = settings.getTemperature();
-        int maxNewTokens = settings.getMaxTokens();
+        int maxTokens = settings.getMaxTokens();
         float topP = settings.getTopP();
         float frequencyPenalty = settings.getFrequencyPenalty();
         float presencePenalty = settings.getPresencePenalty();
@@ -68,16 +74,16 @@ public class StarCoderService {
             httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + property.getProperty("ds.token"));
         }
 
-        JsonObject httpBody = new JsonObject();
-        httpBody.addProperty("model", model);
-        httpBody.addProperty("messages", prompt);
-        httpBody.addProperty("temperature", temperature);
-        httpBody.addProperty("max_tokens", maxNewTokens);
-        httpBody.addProperty("top_p", topP);
-        httpBody.addProperty("frequency_penalty", frequencyPenalty);
-        httpBody.addProperty("presence_penalty", presencePenalty);
+        Map<String, Object> httpBody = new HashMap<>();
+        httpBody.put("model", model);
+        httpBody.put("messages", JSON.parseArray(prompt, Map.class));
+        httpBody.put("temperature", temperature);
+        httpBody.put("max_tokens", maxTokens);
+        httpBody.put("top_p", topP);
+        httpBody.put("frequency_penalty", frequencyPenalty);
+        httpBody.put("presence_penalty", presencePenalty);
 
-        StringEntity requestEntity = new StringEntity(httpBody.toString(), ContentType.APPLICATION_JSON);
+        StringEntity requestEntity = new StringEntity(JSON.toJSONString(httpBody), ContentType.APPLICATION_JSON);
         httpPost.setEntity(requestEntity);
 
         return httpPost;
@@ -102,7 +108,7 @@ public class StarCoderService {
                 return responseText;
             }
             String responseBody = EntityUtils.toString(response.getEntity());
-            JsonObject responseObject = parseResponse(responseBody);
+            ChatCompletionResponse responseObject = parseChatCompletionResponse(responseBody);
             responseText = extractGeneratedText(responseObject).orElse("");
 
             httpClient.close();
@@ -113,28 +119,25 @@ public class StarCoderService {
         return responseText;
     }
 
-    private JsonObject parseResponse(String responseBody) throws IOException {
-        Gson gson = new Gson();
-        JsonArray responseArray;
-
-        try {
-            responseArray = gson.fromJson(responseBody, JsonArray.class);
-            if (responseArray.size() > 0) {
-                return responseArray.get(0).getAsJsonObject();
-            }
-        } catch (JsonSyntaxException ignored) {
-            // Fallback.  Response may be an object rather than an array.
-            return gson.fromJson(responseBody, JsonObject.class);
-        }
-
-        throw new IllegalArgumentException("Response has empty body array");
+    private ChatCompletionResponse parseChatCompletionResponse(String responseBody) throws IOException {
+        JSONObject jsonObject = JSON.parseObject(responseBody);
+        ChatCompletionResponse response = ChatCompletionResponse.builder()
+                .id(jsonObject.getString("id"))
+                .model(jsonObject.getString("model"))
+                .object(jsonObject.getString("object"))
+                .created(jsonObject.getLong("created"))
+                .tokenUsage(jsonObject.getObject("usage", ResponseTokenUsage.class))
+                .choices(Collections.singletonList(jsonObject.getObject("choices", (x) -> JSON.parseObject(String.valueOf(x), ResponseChoice.class))))
+                .build();
+       return response;
     }
 
-    private Optional<String> extractGeneratedText(JsonObject responseObject) {
-        if (responseObject.get("generated_text") != null) {
-            return Optional.of(responseObject.get("generated_text").getAsString());
+    private Optional<String> extractGeneratedText(List<ResponseChoice> choices) {
+        if (Objects.isNull(choices) || choices.isEmpty()) {
+            throw new IllegalArgumentException("Invalid response body missing \\'choices\\' key");
         }
-        throw new IllegalArgumentException("Invalid response body missing \\'generated_text\\' key");
+
+        return Optional.of(choices.get(0).getMessage().getContent());
     }
 
     public String replacementSuggestion (String prompt) {
