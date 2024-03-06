@@ -11,7 +11,7 @@ public enum PromptModel {
     SANTACODER ("santacoder","SantaCoder", "<fim-prefix>","<fim-suffix>","<fim-middle>", "<|endoftext|>"),
     // Whitespace for Code Llama is intentional
     CODELLAMA ("codellama","Code Llama", "<PRE> "," <SUF>"," <MID>", "<EOT>"),
-    DEEPSEEK ("deepseek", "DeepSeek-Coder", "<|fim▁begin|>", "<|fim▁end|>", "<|fim▁hole|>", "<|EOT|>");
+    DEEPSEEK ("deepseek", "DeepSeek-Coder", "<｜fim▁begin｜>", "<｜fim▁end｜>", "<｜fim▁hole｜>", "<|EOT|>");
 
     private final String id;
     private final String displayName;

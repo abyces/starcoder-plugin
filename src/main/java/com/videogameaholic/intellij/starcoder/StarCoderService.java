@@ -1,13 +1,7 @@
 package com.videogameaholic.intellij.starcoder;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.github.weisj.jsvg.S;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.WindowManager;
@@ -18,7 +12,6 @@ import com.videogameaholic.intellij.starcoder.domain.enums.PromptModel;
 import com.videogameaholic.intellij.starcoder.settings.BaseModelSettings;
 import com.videogameaholic.intellij.starcoder.settings.Property;
 import com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings;
-import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
 import groovy.util.logging.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
@@ -112,7 +105,6 @@ public class StarCoderService {
             responseText = extractGeneratedText(chatCompletionResponse.getChoices()).orElse("");
 
             httpClient.close();
-
         } catch (IOException e) {
             // TODO log exception
         }
@@ -121,15 +113,14 @@ public class StarCoderService {
 
     private ChatCompletionResponse parseChatCompletionResponse(String responseBody) throws IOException {
         JSONObject jsonObject = JSON.parseObject(responseBody);
-        ChatCompletionResponse response = ChatCompletionResponse.builder()
-                .id(jsonObject.getString("id"))
-                .model(jsonObject.getString("model"))
-                .object(jsonObject.getString("object"))
-                .created(jsonObject.getLong("created"))
-                .tokenUsage(jsonObject.getObject("usage", ResponseTokenUsage.class))
-                .choices(Collections.singletonList(jsonObject.getObject("choices", (x) -> JSON.parseObject(String.valueOf(x), ResponseChoice.class))))
-                .build();
-       return response;
+        ChatCompletionResponse response = new ChatCompletionResponse();
+        response.setId(jsonObject.getString("id"));
+        response.setModel(jsonObject.getString("model"));
+        response.setObject(jsonObject.getString("object"));
+        response.setCreated(jsonObject.getLong("created"));
+        response.setTokenUsage(jsonObject.getObject("usage", ResponseTokenUsage.class));
+        response.setChoices(JSON.parseArray(jsonObject.getString("choices"), ResponseChoice.class));
+        return response;
     }
 
     private Optional<String> extractGeneratedText(List<ResponseChoice> choices) {
