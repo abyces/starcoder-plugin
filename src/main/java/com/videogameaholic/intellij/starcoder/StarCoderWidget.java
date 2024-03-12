@@ -19,6 +19,7 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.Consumer;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
@@ -35,6 +36,8 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+
+import static com.videogameaholic.intellij.starcoder.SmartCompletionService.getScopeElementAtCaret;
 
 @Slf4j
 public class StarCoderWidget extends EditorBasedWidget
@@ -280,6 +283,11 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
         StarCoderService starCoder = ApplicationManager.getApplication().getService(StarCoderService.class);
         CharSequence editorContents = focusedEditor.getDocument().getCharsSequence();
 
+        // TODO: insert algo
+        PsiElement scopeElement = getScopeElementAtCaret(focusedEditor);
+        if (scopeElement != null) {
+            System.out.println(scopeElement);
+        }
         serviceQueue.queue(Update.create(focusedEditor,() -> {
             String[] hintList = starCoder.getCodeCompletionHints(editorContents, currentPosition);
             this.addCodeSuggestion(focusedEditor, file, currentPosition, hintList);
