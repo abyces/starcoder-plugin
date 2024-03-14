@@ -22,7 +22,7 @@ dependencies {
 intellij {
     version.set("2023.3")
     type.set("IU")
-    plugins.set(listOf())
+    plugins.set(listOf("com.intellij.java"))
 }
 
 kotlin {

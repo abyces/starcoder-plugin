@@ -19,7 +19,10 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget;
+import com.intellij.psi.PsiCodeBlock;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.util.Consumer;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
@@ -36,8 +39,10 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.Objects;
 
-import static com.videogameaholic.intellij.starcoder.SmartCompletionService.getScopeElementAtCaret;
+import static com.videogameaholic.intellij.starcoder.SmartCompletionService.getEnclosingCodeBlock;
+import static com.videogameaholic.intellij.starcoder.SmartCompletionService.isCursorAtEndOfScope;
 
 @Slf4j
 public class StarCoderWidget extends EditorBasedWidget
@@ -50,6 +55,8 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
     private static final String SWING_FOCUS_OWNER_PROPERTY = "SwingFocusOwner";
 
     private MergingUpdateQueue serviceQueue;
+
+    private boolean startCodeCompletion = false;
 
     protected StarCoderWidget(@NotNull Project project) {
         super(project);
@@ -165,6 +172,12 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
         Component focusOwner = getFocusOwnerComponent();
         return focusOwner == editor.getContentComponent();
     }
+
+    @Override
+    public void documentChanged(@NotNull DocumentEvent e) {
+        startCodeCompletion = true;
+    }
+
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -283,11 +296,20 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
         StarCoderService starCoder = ApplicationManager.getApplication().getService(StarCoderService.class);
         CharSequence editorContents = focusedEditor.getDocument().getCharsSequence();
 
-        // TODO: insert algo
-        PsiElement scopeElement = getScopeElementAtCaret(focusedEditor);
-        if (scopeElement != null) {
-            System.out.println(scopeElement);
+        if (!startCodeCompletion)
+            return;
+
+        PsiFile psiFile = PsiDocumentManager.getInstance(Objects.requireNonNull(focusedEditor.getProject())).getPsiFile(focusedEditor.getDocument());
+        if (psiFile != null) {
+            PsiCodeBlock codeBlock = getEnclosingCodeBlock(focusedEditor, psiFile);
+            if (codeBlock != null) {
+                // 现在你可以对 codeBlock 进行操作，例如获取其文本或类型
+                boolean isCursorAtEnd = isCursorAtEndOfScope(focusedEditor, codeBlock);
+                // 根据需要处理 isCursorAtEnd 的值
+
+            }
         }
+
         serviceQueue.queue(Update.create(focusedEditor,() -> {
             String[] hintList = starCoder.getCodeCompletionHints(editorContents, currentPosition);
             this.addCodeSuggestion(focusedEditor, file, currentPosition, hintList);

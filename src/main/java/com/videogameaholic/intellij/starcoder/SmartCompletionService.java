@@ -9,27 +9,14 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 
 public class SmartCompletionService {
-    public static PsiElement getScopeElementAtCaret(Editor editor) {
-        PsiFile file = getCurrentPsiFile(editor.getProject());
+    public static PsiCodeBlock getEnclosingCodeBlock(Editor editor, PsiFile file) {
         // 获取光标在文件中的偏移量
         int offset = editor.getCaretModel().getOffset();
         // 在给定偏移量找到 PSI 元素
         PsiElement element = file.findElementAt(offset);
-        // 使用 PsiTreeUtil 获取作用域元素，例如方法或循环体
-        PsiElement scopeElement = PsiTreeUtil.getParentOfType(element, PsiElement.class);
-        return scopeElement;
-    }
-
-    public static PsiFile getCurrentPsiFile(Project project) {
-        // 获取当前激活的编辑器
-        Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-        // 如果没有打开的编辑器，则返回 null
-        if (editor == null) {
-            return null;
-        }
-        // 使用编辑器实例来获取 PsiFile
-        PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
-        return psiFile;
+        // 使用 PsiTreeUtil 获取包含当前元素的最外层代码块
+        PsiCodeBlock codeBlock = PsiTreeUtil.getParentOfType(element, PsiCodeBlock.class);
+        return codeBlock;
     }
 
     public static boolean isCursorAtEndOfScope(Editor editor, PsiCodeBlock codeBlock) {
