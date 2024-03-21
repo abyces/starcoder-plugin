@@ -1,7 +1,9 @@
 package com.videogameaholic.intellij.starcoder;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.TypeReference;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.WindowManager;
@@ -67,9 +69,12 @@ public class StarCoderService {
             httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + property.getProperty("ds.token"));
         }
 
+//        JSONArray promptArray = JSON.parseArray(prompt);
+//        List<Map> messages = promptArray.toJavaList(Map.class);
+        List<Map<String, Object>> messages = JSON.parseObject(prompt, new TypeReference<List<Map<String, Object>>>() {});
         Map<String, Object> httpBody = new HashMap<>();
         httpBody.put("model", model);
-        httpBody.put("messages", JSON.parseArray(prompt, Map.class));
+        httpBody.put("messages", messages);
         httpBody.put("temperature", temperature);
         httpBody.put("max_tokens", maxTokens);
         httpBody.put("top_p", topP);
