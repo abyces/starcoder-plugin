@@ -1,12 +1,9 @@
 package com.videogameaholic.intellij.starcoder;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONPath;
 import com.alibaba.fastjson2.TypeReference;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.wm.WindowManager;
 import com.videogameaholic.intellij.starcoder.domain.dto.ChatCompletionResponse;
 import com.videogameaholic.intellij.starcoder.domain.dto.ResponseChoice;
 import com.videogameaholic.intellij.starcoder.domain.dto.ResponseTokenUsage;
@@ -14,19 +11,14 @@ import com.videogameaholic.intellij.starcoder.domain.enums.PromptModel;
 import com.videogameaholic.intellij.starcoder.settings.BaseModelSettings;
 import com.videogameaholic.intellij.starcoder.settings.Property;
 import com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings;
+import com.videogameaholic.intellij.starcoder.utils.OkHttpUtil;
 import groovy.util.logging.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.util.*;
+
 
 @Slf4j
 public class StarCoderService {
@@ -48,72 +40,36 @@ public class StarCoderService {
         System.out.println("ChatCompletion Prompt: {}".replace("{}", prompt));
         if(prompt.isEmpty()) return null;
 
-        HttpPost httpPost = buildApiPost(settings, prompt);
-        String generatedText = getApiResponse(httpPost);
-        System.out.println(String.format("ChatCompletion Prompt: {}", generatedText));
+        String generatedText = buildApiPost(settings, prompt);
+        System.out.println(generatedText);
         return fimModel.buildSuggestionList(generatedText);
     }
 
-    private HttpPost buildApiPost (BaseModelSettings settings, String prompt) {
+    /**
+     * 构建API POST请求
+     *
+     * @param settings  BaseModelSettings对象，包含API配置
+     * @param prompt   提示文本
+     * @return response
+     */
+    public String buildApiPost(BaseModelSettings settings, String prompt) {
         String apiURL = settings.getApiURL();
-        String bearerToken = settings.getApiToken();
-        float temperature = settings.getTemperature();
-        int maxTokens = settings.getMaxTokens();
-        float topP = settings.getTopP();
-        float frequencyPenalty = settings.getFrequencyPenalty();
-        float presencePenalty = settings.getPresencePenalty();
-        String model = settings.getModel();
-
-        HttpPost httpPost = new HttpPost(apiURL);
-        if(!bearerToken.isBlank() || bearerToken.isEmpty()) {
-            httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + property.getProperty("ds.token"));
-        }
-
-//        JSONArray promptArray = JSON.parseArray(prompt);
-//        List<Map> messages = promptArray.toJavaList(Map.class);
+        String bearerToken = property.getProperty("ds.token");
         List<Map<String, Object>> messages = JSON.parseObject(prompt, new TypeReference<List<Map<String, Object>>>() {});
         Map<String, Object> httpBody = new HashMap<>();
-        httpBody.put("model", model);
+        httpBody.put("model", settings.getModel());
         httpBody.put("messages", messages);
-        httpBody.put("temperature", temperature);
-        httpBody.put("max_tokens", maxTokens);
-        httpBody.put("top_p", topP);
-        httpBody.put("frequency_penalty", frequencyPenalty);
-        httpBody.put("presence_penalty", presencePenalty);
+        httpBody.put("temperature", settings.getTemperature());
+        httpBody.put("max_tokens", settings.getMaxTokens());
+        httpBody.put("top_p", settings.getTopP());
+        httpBody.put("frequency_penalty", settings.getFrequencyPenalty());
+        httpBody.put("presence_penalty", settings.getPresencePenalty());
 
-        StringEntity requestEntity = new StringEntity(JSON.toJSONString(httpBody), ContentType.APPLICATION_JSON);
-        httpPost.setEntity(requestEntity);
-
-        return httpPost;
-    }
-
-    private String getApiResponse(HttpPost httpPost) {
-        String responseText = "";
-        try {
-            CloseableHttpClient httpClient = HttpClients.createDefault();
-            HttpResponse response = httpClient.execute(httpPost);
-
-            // Check the response status code
-            int oldStatusCode = statusCode;
-            statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode != oldStatusCode) {
-                // Update the widget based on the new status code
-                for (Project openProject : ProjectManager.getInstance().getOpenProjects()) {
-                    WindowManager.getInstance().getStatusBar(openProject).updateWidget(StarCoderWidget.ID);
-                }
-            }
-            if (statusCode != 200) {
-                return responseText;
-            }
-            String responseBody = EntityUtils.toString(response.getEntity());
-            ChatCompletionResponse chatCompletionResponse = parseChatCompletionResponse(responseBody);
-            responseText = extractGeneratedText(chatCompletionResponse.getChoices()).orElse("");
-
-            httpClient.close();
-        } catch (IOException e) {
-            // TODO log exception
+        String response = OkHttpUtil.post(apiURL, JSON.toJSONString(httpBody), bearerToken);
+        if (StringUtils.isBlank(response)) {
+            return "";
         }
-        return responseText;
+        return String.valueOf(JSONPath.extract(response, "$.choices[0].message.content"));
     }
 
     private ChatCompletionResponse parseChatCompletionResponse(String responseBody) throws IOException {
@@ -141,8 +97,7 @@ public class StarCoderService {
         String replacement = prompt;
 
         DeepSeekSettings settings = DeepSeekSettings.getInstance();
-        HttpPost httpPost = buildApiPost(settings, prompt);
-        String generatedText = getApiResponse(httpPost);
+        String generatedText = buildApiPost(settings, prompt);
         if(!StringUtils.isEmpty(generatedText)) {
             replacement = generatedText;
         }

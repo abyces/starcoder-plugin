@@ -38,7 +38,7 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
     private float presencePenalty = 0f;
     private PromptModel fimTokenModel = PromptModel.DEEPSEEK;
     private String model = "deepseek-coder";
-    private String messages = "[\n{\"role\": \"system\", \"content\": \"You are a helpful assistant, fill the <fim_hole> with correct code and just return these replaced code.\"},\n{\"role\": \"user\", \"content\": \"<PLACEHOLDER>\"}]";
+    private String messages = "[{\"role\": \"system\", \"content\": \"You are a helpful assistant, just replace <FILL_ME> with correct code. No more explanation!\"},{\"role\": \"user\", \"content\": <PLACEHOLDER>}]";
 
 
     private static final DeepSeekSettings deepSeekSettingsInstance = new DeepSeekSettings();

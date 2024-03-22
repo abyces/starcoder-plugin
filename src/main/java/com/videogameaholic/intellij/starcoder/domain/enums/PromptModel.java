@@ -4,6 +4,8 @@ import com.videogameaholic.intellij.starcoder.settings.BaseModelSettings;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public enum PromptModel {
@@ -62,14 +64,16 @@ public enum PromptModel {
     public String generateChatCompletionPrompt(String metaData, String code, int fillPosition) {
         String prefix = code.substring(0, fillPosition);
         String suffix = code.substring(fillPosition);
-        return prefix + "<fim_hole>" + suffix;
+        return prefix + "<FILL_ME>" + suffix;
     }
 
     @Nullable
     public String[] buildSuggestionList(String generatedText) {
-        String[] suggestionList = null;
-        generatedText = generatedText.replace(endTag, "");
-
+        String[] suggestionList = new String[1];
+        String response = generatedText.replace(endTag, "");
+        int idx1 = response.indexOf("```java\n");
+        int idx2 = response.indexOf("\n```", idx1 + 8);
+        suggestionList[0] = response.substring(idx1 + 8, idx2-1);
         return suggestionList;
     }
 }
