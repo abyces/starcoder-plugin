@@ -1,7 +1,7 @@
 package com.videogameaholic.intellij.starcoder.settings;
 
 import com.intellij.ui.EnumComboBoxModel;
-import com.videogameaholic.intellij.starcoder.domain.enums.PromptModel;
+import com.videogameaholic.intellij.starcoder.domain.models.PromptModel;
 import com.videogameaholic.intellij.starcoder.domain.enums.TabActionOption;
 
 import javax.swing.*;
@@ -17,7 +17,6 @@ public class SettingsPanel {
     private JTextField maxNewTokensTextField;
     private JTextField topPTextField;
     private JTextField repetitionTextField;
-    private JCheckBox enableSAYTCheckBox;
     private JPanel Settings;
     private JPanel ParamOuter;
     private JPanel TabActionPanel;
@@ -30,12 +29,6 @@ public class SettingsPanel {
     public SettingsPanel() {
         tabActionComboBox.setModel(new EnumComboBoxModel<>(TabActionOption.class));
         fimModelComboBox.setModel(new EnumComboBoxModel<>(PromptModel.class));
-        enableSAYTCheckBox.addActionListener(e -> {
-            tabActionLabel.setEnabled(enableSAYTCheckBox.isSelected());
-            tabActionComboBox.setEnabled(enableSAYTCheckBox.isSelected());
-            fimModelLabel.setEnabled(enableSAYTCheckBox.isSelected());
-        	fimModelComboBox.setEnabled(enableSAYTCheckBox.isSelected());
-        });
     }
 
     public JComponent getPanel() {
@@ -88,18 +81,6 @@ public class SettingsPanel {
 
     public void setRepetition(String repetition) {
         repetitionTextField.setText(repetition);
-    }
-
-    public boolean getEnableSAYTCheckBox() {
-        return enableSAYTCheckBox.isSelected();
-    }
-
-    public void setEnableSAYTCheckBox(boolean enableSAYT) {
-        enableSAYTCheckBox.setSelected(enableSAYT);
-        tabActionLabel.setEnabled(enableSAYT);
-        tabActionComboBox.setEnabled(enableSAYT);
-        fimModelLabel.setEnabled(enableSAYT);
-        fimModelComboBox.setEnabled(enableSAYT);
     }
 
     public TabActionOption getTabActionOption() {

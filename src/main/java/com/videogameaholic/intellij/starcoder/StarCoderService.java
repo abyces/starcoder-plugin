@@ -7,14 +7,13 @@ import com.alibaba.fastjson2.TypeReference;
 import com.videogameaholic.intellij.starcoder.domain.dto.ChatCompletionResponse;
 import com.videogameaholic.intellij.starcoder.domain.dto.ResponseChoice;
 import com.videogameaholic.intellij.starcoder.domain.dto.ResponseTokenUsage;
-import com.videogameaholic.intellij.starcoder.domain.enums.PromptModel;
+import com.videogameaholic.intellij.starcoder.domain.models.PromptModel;
 import com.videogameaholic.intellij.starcoder.settings.BaseModelSettings;
-import com.videogameaholic.intellij.starcoder.settings.Property;
+import com.videogameaholic.intellij.starcoder.utils.PropertyUtil;
 import com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings;
 import com.videogameaholic.intellij.starcoder.utils.OkHttpUtil;
 import groovy.util.logging.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpPost;
 
 import java.io.IOException;
 import java.util.*;
@@ -23,12 +22,12 @@ import java.util.*;
 @Slf4j
 public class StarCoderService {
 
-    private Property property;
+    private PropertyUtil propertyUtil;
 
     private int statusCode = 200;
 
     public StarCoderService() {
-        property = new Property();
+        propertyUtil = new PropertyUtil();
     }
 
     public String[] getCodeCompletionHints(CharSequence editorContents, int cursorPosition) {
@@ -41,7 +40,6 @@ public class StarCoderService {
         if(prompt.isEmpty()) return null;
 
         String generatedText = buildApiPost(settings, prompt);
-        System.out.println(generatedText);
         return fimModel.buildSuggestionList(generatedText);
     }
 
@@ -54,7 +52,7 @@ public class StarCoderService {
      */
     public String buildApiPost(BaseModelSettings settings, String prompt) {
         String apiURL = settings.getApiURL();
-        String bearerToken = property.getProperty("ds.token");
+        String bearerToken = propertyUtil.getProperty("ds.token");
         List<Map<String, Object>> messages = JSON.parseObject(prompt, new TypeReference<List<Map<String, Object>>>() {});
         Map<String, Object> httpBody = new HashMap<>();
         httpBody.put("model", settings.getModel());

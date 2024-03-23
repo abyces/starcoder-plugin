@@ -1,9 +1,10 @@
-package com.videogameaholic.intellij.starcoder.domain.enums;
+package com.videogameaholic.intellij.starcoder.domain.models;
 
-import com.videogameaholic.intellij.starcoder.settings.BaseModelSettings;
-import org.apache.commons.lang3.StringUtils;
+import com.alibaba.fastjson2.JSON;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -21,6 +22,9 @@ public enum PromptModel {
     private final String suffixTag;
     private final String middleTag;
     private final String endTag;
+
+    private final String regex = "```(?:java|js|python|javascript)?\\n([\\s\\S]*?)```";
+    private final Pattern pattern = Pattern.compile(regex);
 
     private PromptModel(String uniqueId, String name, String prefix, String suffix, String middle, String end)
     {
@@ -69,11 +73,15 @@ public enum PromptModel {
 
     @Nullable
     public String[] buildSuggestionList(String generatedText) {
-        String[] suggestionList = new String[1];
-        String response = generatedText.replace(endTag, "");
-        int idx1 = response.indexOf("```java\n");
-        int idx2 = response.indexOf("\n```", idx1 + 8);
-        suggestionList[0] = response.substring(idx1 + 8, idx2-1);
-        return suggestionList;
+        System.out.println("Generated Text: " + generatedText);
+        List<String> suggestionList = new ArrayList<>();
+        Matcher matcher = pattern.matcher(generatedText);
+        if (matcher.find()) {
+            suggestionList.add(matcher.group(1));
+        } else {
+            suggestionList.add("");
+        }
+        System.out.println("Matched Results: " + JSON.toJSONString(suggestionList));
+        return suggestionList.toArray(new String[] {});
     }
 }

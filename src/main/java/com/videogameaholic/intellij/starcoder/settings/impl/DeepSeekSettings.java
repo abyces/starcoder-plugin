@@ -7,7 +7,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.videogameaholic.intellij.starcoder.domain.enums.PromptModel;
+import com.videogameaholic.intellij.starcoder.domain.models.PromptModel;
 import com.videogameaholic.intellij.starcoder.settings.BaseModelSettings;
 import com.videogameaholic.intellij.starcoder.domain.enums.TabActionOption;
 import org.jdom.Element;
@@ -38,7 +38,7 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
     private float presencePenalty = 0f;
     private PromptModel fimTokenModel = PromptModel.DEEPSEEK;
     private String model = "deepseek-coder";
-    private String messages = "[{\"role\": \"system\", \"content\": \"You are a helpful assistant, just replace <FILL_ME> with correct code. No more explanation!\"},{\"role\": \"user\", \"content\": <PLACEHOLDER>}]";
+    private String messages = "[{\"role\": \"user\", \"content\": \"Directly replace <FILL_ME> with correct code. Just Code, No explanation, No Other words!\ncode:\n<PLACEHOLDER>\"}";
 
 
     private static final DeepSeekSettings deepSeekSettingsInstance = new DeepSeekSettings();

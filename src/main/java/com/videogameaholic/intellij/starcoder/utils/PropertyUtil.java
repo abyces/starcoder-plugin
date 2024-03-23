@@ -1,18 +1,17 @@
-package com.videogameaholic.intellij.starcoder.settings;
+package com.videogameaholic.intellij.starcoder.utils;
 
 import groovy.util.logging.Slf4j;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 @Slf4j
-public class Property {
+public class PropertyUtil {
     private Properties prop;
 
-    public Property() {
+    public PropertyUtil() {
         prop = new Properties(); // 初始化 Properties 对象
 
         // 使用类加载器加载资源

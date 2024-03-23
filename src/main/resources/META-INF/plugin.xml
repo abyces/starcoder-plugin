@@ -88,7 +88,7 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <editorOptionsProvider instance="com.videogameaholic.intellij.starcoder.settings.DeepSeekSettingsProvider"/>
+        <editorOptionsProvider instance="com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettingsProvider"/>
 
         <applicationService serviceImplementation="com.videogameaholic.intellij.starcoder.StarCoderService"/>
         <applicationService serviceImplementation="com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings"/>

@@ -1,4 +1,4 @@
-package com.videogameaholic.intellij.starcoder.settings;
+package com.videogameaholic.intellij.starcoder.settings.impl;
 
 import com.intellij.application.options.editor.EditorOptionsProvider;
 import com.intellij.notification.Notification;
@@ -10,7 +10,8 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.wm.WindowManager;
 import com.videogameaholic.intellij.starcoder.StarCoderWidget;
-import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
+import com.videogameaholic.intellij.starcoder.settings.SettingsPanel;
+import com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings;
 import groovy.util.logging.Slf4j;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -20,17 +21,17 @@ import javax.swing.*;
 import java.awt.*;
 
 @Slf4j
-public class StarCoderSettingsProvider implements EditorOptionsProvider {
+public class DeepSeekSettingsProvider implements EditorOptionsProvider {
     private SettingsPanel settingsPanel;
 
     @Override
     public @NotNull @NonNls String getId() {
-        return "StarCoder.Settings";
+        return "DeepSeek.Settings";
     }
 
     @Override
     public @NlsContexts.ConfigurableName String getDisplayName() {
-        return "StarCoder";
+        return "DeepSeek";
     }
 
     @Override
@@ -43,31 +44,31 @@ public class StarCoderSettingsProvider implements EditorOptionsProvider {
 
     @Override
     public boolean isModified() {
-        StarCoderSettings savedSettings = StarCoderSettings.getInstance();
+        DeepSeekSettings savedSettings = DeepSeekSettings.getInstance();
 
         return !savedSettings.getApiURL().equals(settingsPanel.getApiUrl())
                 || !savedSettings.getApiToken().equals(settingsPanel.getApiToken())
                 || savedSettings.getTabActionOption() != settingsPanel.getTabActionOption()
-                || savedSettings.isSaytEnabled() != settingsPanel.getEnableSAYTCheckBox()
                 || savedSettings.getTemperature() != Float.parseFloat(settingsPanel.getTemperature())
-                || savedSettings.getMaxNewTokens() != Integer.parseInt(settingsPanel.getMaxNewTokens())
+                || savedSettings.getMaxTokens() != Integer.parseInt(settingsPanel.getMaxNewTokens())
                 || savedSettings.getTopP() != Float.parseFloat(settingsPanel.getTopP())
-                || savedSettings.getRepetitionPenalty() != Float.parseFloat(settingsPanel.getRepetition())
-                ||!savedSettings.getFimTokenModel().equals(settingsPanel.getFimTokenModel());
+                || savedSettings.getFrequencyPenalty() != Float.parseFloat(settingsPanel.getRepetition())
+                || savedSettings.getPresencePenalty() != Float.parseFloat(settingsPanel.getRepetition())
+                || !savedSettings.getFimTokenModel().equals(settingsPanel.getFimTokenModel());
     }
 
     @Override
     public void apply() throws ConfigurationException {
-        StarCoderSettings savedSettings = StarCoderSettings.getInstance();
+        DeepSeekSettings savedSettings = DeepSeekSettings.getInstance();
 
         savedSettings.setApiURL(settingsPanel.getApiUrl());
         savedSettings.setApiToken(settingsPanel.getApiToken());
-        savedSettings.setSaytEnabled(settingsPanel.getEnableSAYTCheckBox());
         savedSettings.setTabActionOption(settingsPanel.getTabActionOption());
         savedSettings.setTemperature(settingsPanel.getTemperature());
-        savedSettings.setMaxNewTokens(settingsPanel.getMaxNewTokens());
+        savedSettings.setMaxTokens(settingsPanel.getMaxNewTokens());
         savedSettings.setTopP(settingsPanel.getTopP());
-        savedSettings.setRepetitionPenalty(settingsPanel.getRepetition());
+        savedSettings.setFrequencyPenalty(settingsPanel.getRepetition());
+        savedSettings.setPresencePenalty(settingsPanel.getRepetition());
         savedSettings.setFimTokenModel(settingsPanel.getFimTokenModel());
         if(settingsPanel.getApiToken().isBlank()){
             Project[] projects = ProjectManager.getInstance().getOpenProjects();
@@ -78,9 +79,6 @@ public class StarCoderSettingsProvider implements EditorOptionsProvider {
                     activeProject = project;
                 }
             }
-            Notifications.Bus.notify(
-                    new Notification("StarCoder","StarCoder", "StarCoder API token is recommended.", NotificationType.WARNING)
-                    ,activeProject);
         }
 
         // Update the widget
@@ -91,16 +89,16 @@ public class StarCoderSettingsProvider implements EditorOptionsProvider {
 
     @Override
     public void reset() {
-        StarCoderSettings savedSettings = StarCoderSettings.getInstance();
+        DeepSeekSettings savedSettings = DeepSeekSettings.getInstance();
 
         settingsPanel.setApiUrl(savedSettings.getApiURL());
         settingsPanel.setApiToken(savedSettings.getApiToken());
-        settingsPanel.setEnableSAYTCheckBox(savedSettings.isSaytEnabled());
         settingsPanel.setTabActionOption(savedSettings.getTabActionOption());
         settingsPanel.setTemperature(String.valueOf(savedSettings.getTemperature()));
-        settingsPanel.setMaxNewTokens(String.valueOf(savedSettings.getMaxNewTokens()));
+        settingsPanel.setMaxNewTokens(String.valueOf(savedSettings.getMaxTokens()));
         settingsPanel.setTopP(String.valueOf(savedSettings.getTopP()));
-        settingsPanel.setRepetition(String.valueOf(savedSettings.getRepetitionPenalty()));
+        settingsPanel.setRepetition(String.valueOf(savedSettings.getFrequencyPenalty()));
         settingsPanel.setFimTokenModel(savedSettings.getFimTokenModel());
     }
 }
+

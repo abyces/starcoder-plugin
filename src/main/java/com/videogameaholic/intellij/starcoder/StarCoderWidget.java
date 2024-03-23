@@ -21,13 +21,11 @@ import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget;
 import com.intellij.psi.PsiCodeBlock;
 import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.Consumer;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.videogameaholic.intellij.starcoder.domain.enums.StarCoderStatus;
-import com.videogameaholic.intellij.starcoder.settings.impl.StarCoderSettings;
 import groovy.util.logging.Slf4j;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -77,7 +75,7 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
         StarCoderService starCoder = ApplicationManager.getApplication().getService(StarCoderService.class);
         StarCoderStatus status = StarCoderStatus.getStatusByCode(starCoder.getStatus());
         if(status == StarCoderStatus.OK) {
-            return StarCoderSettings.getInstance().isSaytEnabled() ? StarCoderIcons.WidgetEnabled : StarCoderIcons.WidgetDisabled;
+            return StarCoderIcons.WidgetEnabled;
         } else {
             return StarCoderIcons.WidgetError;
         }
@@ -91,22 +89,12 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
     @Override
     public @Nullable @NlsContexts.Tooltip String getTooltipText() {
         StringBuilder toolTipText = new StringBuilder("StarCoder");
-        if(StarCoderSettings.getInstance().isSaytEnabled()) {
-            toolTipText.append(" enabled");
-        } else {
-            toolTipText.append(" disabled");
-        }
-
+        toolTipText.append(" enabled");
         StarCoderService starCoder = ApplicationManager.getApplication().getService(StarCoderService.class);
         int statusCode = starCoder.getStatus();
         StarCoderStatus status = StarCoderStatus.getStatusByCode(statusCode);
         switch (status) {
             case OK:
-                if(StarCoderSettings.getInstance().isSaytEnabled()) {
-                    toolTipText.append(" (Click to disable)");
-                } else {
-                    toolTipText.append(" (Click to enable)");
-                }
                 break;
             case UNKNOWN:
                 toolTipText.append(" (http error ");
@@ -126,7 +114,6 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
     public @Nullable Consumer<MouseEvent> getClickConsumer() {
         // Toggle if the plugin is enabled.
         return mouseEvent -> {
-            StarCoderSettings.getInstance().toggleSaytEnabled();
             if(myStatusBar != null) {
                 myStatusBar.updateWidget(ID);
             }
@@ -319,12 +306,16 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
     private void addCodeSuggestion(Editor focusedEditor, VirtualFile file, int suggestionPosition, String[] hintList) {
         WriteCommandAction.runWriteCommandAction(focusedEditor.getProject(), () -> {
             // Discard this update if the position has changed or text is now selected.
-            if (suggestionPosition != focusedEditor.getCaretModel().getOffset()) return;
-            if (focusedEditor.getSelectionModel().getSelectedText() != null) return;
-
+            if (suggestionPosition != focusedEditor.getCaretModel().getOffset()) {
+                System.out.println("StarCoderWidget.addCodeSuggestion -> Position changed. from: " + suggestionPosition + "to: " + focusedEditor.getCaretModel().getOffset());
+                return;
+            }
+            if (focusedEditor.getSelectionModel().getSelectedText() != null) {
+                System.out.println("StarCoderWidget.addCodeSuggestion -> Text selected.");
+                return;
+            }
             file.putUserData(STAR_CODER_CODE_SUGGESTION, hintList);
             file.putUserData(STAR_CODER_POSITION, suggestionPosition);
-
             InlayModel inlayModel = focusedEditor.getInlayModel();
             inlayModel.getInlineElementsInRange(0, focusedEditor.getDocument().getTextLength(), CodeGenHintRenderer.class).forEach(Disposable::dispose);
             inlayModel.getBlockElementsInRange(0, focusedEditor.getDocument().getTextLength(), CodeGenHintRenderer.class).forEach(Disposable::dispose);
