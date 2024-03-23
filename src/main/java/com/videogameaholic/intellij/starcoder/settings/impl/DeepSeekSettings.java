@@ -31,9 +31,9 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
 
     private String apiURL = "https://api.deepseek.com/v1/chat/completions";
     private TabActionOption tabActionOption = TabActionOption.ALL;
-    private float temperature = 1.0f;
+    private float temperature = 0f;
     private int maxTokens = 2048;
-    private float topP = 0.9f;
+    private float topP = 0.0f;
     private float frequencyPenalty = 0f;
     private float presencePenalty = 0f;
     private PromptModel fimTokenModel = PromptModel.DEEPSEEK;
@@ -208,27 +208,3 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
         return getFrequencyPenalty();
     }
 }
-
-/**
- * {
- *   "messages": [
- *     {
- *       "content": "You are a helpful assistant, fill the <|fim_hole|> with correct code.",
- *       "role": "system"
- *     },
- *     {
- *       "content": "def hello_world:\n<｜fim▁hole｜>",
- *       "role": "user"
- *     }
- *   ],
- *   "model": "deepseek-coder",
- *   "frequency_penalty": 0,
- *   "max_tokens": 2048,
- *   "presence_penalty": 0,
- *   "stop": null,
- *   "stream": false,
- *   "temperature": 1,
- *   "top_p": 1
- * }
- */
-

@@ -79,7 +79,7 @@ public enum PromptModel {
         if (matcher.find()) {
             suggestionList.add(matcher.group(1));
         } else {
-            suggestionList.add("");
+            suggestionList.add(generatedText);
         }
         System.out.println("Matched Results: " + JSON.toJSONString(suggestionList));
         return suggestionList.toArray(new String[] {});

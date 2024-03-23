@@ -1,4 +1,4 @@
-package com.videogameaholic.intellij.starcoder.action;
+package com.videogameaholic.intellij.starcoder.actions;
 
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;

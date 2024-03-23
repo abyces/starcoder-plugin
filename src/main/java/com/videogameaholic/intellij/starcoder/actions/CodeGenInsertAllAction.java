@@ -1,4 +1,4 @@
-package com.videogameaholic.intellij.starcoder.action;
+package com.videogameaholic.intellij.starcoder.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;

@@ -308,7 +308,9 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
             // Discard this update if the position has changed or text is now selected.
             if (suggestionPosition != focusedEditor.getCaretModel().getOffset()) {
                 System.out.println("StarCoderWidget.addCodeSuggestion -> Position changed. from: " + suggestionPosition + "to: " + focusedEditor.getCaretModel().getOffset());
-                return;
+                if ((focusedEditor.getCaretModel().getOffset() - suggestionPosition) % 4 != 0) {
+                    return;
+                }
             }
             if (focusedEditor.getSelectionModel().getSelectedText() != null) {
                 System.out.println("StarCoderWidget.addCodeSuggestion -> Text selected.");
