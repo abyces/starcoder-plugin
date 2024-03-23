@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.smartcoder.domain.enums.CompletionType;
 import com.intellij.smartcoder.services.CodeCompletionService;
 import com.intellij.smartcoder.settings.BaseModelSettings;
+import com.intellij.smartcoder.settings.impl.DeepSeekSettings;
 import com.intellij.smartcoder.utils.OkHttpUtil;
 import com.intellij.smartcoder.utils.PropertyUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -16,12 +17,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CodeCompletionServiceImpl implements CodeCompletionService {
-    private BaseModelSettings modelSetting;
+    private final BaseModelSettings modelSetting;
     private int statusCode = 200;
     private final Pattern pattern = Pattern.compile("```(?:java|js|python|javascript)?\\n([\\s\\S]*?)```");
 
-    public CodeCompletionServiceImpl(BaseModelSettings settings) {
-        modelSetting = settings;
+    public CodeCompletionServiceImpl() {
+        modelSetting = DeepSeekSettings.getInstance();
     }
 
     /**
@@ -45,7 +46,9 @@ public class CodeCompletionServiceImpl implements CodeCompletionService {
                 }}
         );
 
+        System.out.println(JSON.toJSONString(messages));
         String generatedText = getChatCompletionResponse(messages, CompletionType.MULTI_LINE);
+        System.out.println(generatedText);
         return Objects.requireNonNull(buildSuggestionList(generatedText)).toArray(new String[] {});
     }
 
@@ -76,7 +79,6 @@ public class CodeCompletionServiceImpl implements CodeCompletionService {
         if (CompletionType.ONE_LINE == completionType) {
             httpBody.put("stop", List.of("\n"));
         }
-
         String response = OkHttpUtil.post(apiURL, JSON.toJSONString(httpBody), bearerToken);
         if (StringUtils.isBlank(response)) {
             return "";

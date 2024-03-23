@@ -1,6 +1,7 @@
 package com.intellij.smartcoder.utils;
 
 import com.alibaba.fastjson2.JSON;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -77,11 +78,15 @@ public class OkHttpUtil {
         Request request = new Request.Builder()
                 .url(url)
                 .header("Authorization", "Bearer " + authToken) // 添加Bearer授权头部
-                .post(okhttp3.FormBody.create(params, null))
+                .header("Content-Type", "application/json")
+                .post(okhttp3.FormBody.create(params, MediaType.parse("application/json; charset=utf-8")))
                 .build();
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful() && response.body() != null) {
                 return response.body().string();
+            } else {
+                System.out.println(response);
+                return "";
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -99,7 +104,8 @@ public class OkHttpUtil {
     public static String post(String url, String params) {
         Request request = new Request.Builder()
                 .url(url)
-                .post(okhttp3.FormBody.create(params, null))
+                .header("Content-Type", "application/json")
+                .post(okhttp3.FormBody.create(params, MediaType.parse("application/json; charset=utf-8")))
                 .build();
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful() && response.body() != null) {

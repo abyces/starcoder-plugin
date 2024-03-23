@@ -30,9 +30,9 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
 
     private String apiURL = "https://api.deepseek.com/v1/chat/completions";
     private TabActionOption tabActionOption = TabActionOption.ALL;
-    private float temperature = 0f;
+    private float temperature = 0.5f;
     private int maxTokens = 2048;
-    private float topP = 0.0f;
+    private float topP = 0.9f;
     private float frequencyPenalty = 0f;
     private float presencePenalty = 0f;
     private PromptModel fimTokenModel = PromptModel.DEEPSEEK;
