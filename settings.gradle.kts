@@ -1,1 +1,1 @@
-rootProject.name = "starcoder-intellij"
+rootProject.name = "starcoder-plugin"

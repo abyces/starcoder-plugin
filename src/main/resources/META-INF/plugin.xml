@@ -88,37 +88,37 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <editorOptionsProvider instance="com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettingsProvider"/>
+        <editorOptionsProvider instance="com.intellij.smartcoder.settings.impl.DeepSeekSettingsProvider"/>
 
-        <applicationService serviceImplementation="com.videogameaholic.intellij.starcoder.StarCoderService"/>
-        <applicationService serviceImplementation="com.videogameaholic.intellij.starcoder.settings.impl.DeepSeekSettings"/>
+        <applicationService serviceImplementation="com.intellij.smartcoder.services.impl.CodeCompletionServiceImpl"/>
+        <applicationService serviceImplementation="com.intellij.smartcoder.settings.impl.DeepSeekSettings"/>
 
         <statusBarWidgetFactory id="StarCoderFactory"
-                                implementation="com.videogameaholic.intellij.starcoder.StarCoderWidgetFactory"
+                                implementation="com.intellij.smartcoder.SmartCoderWidgetFactory"
                                 />
 
-        <editorActionHandler action="EditorTab" implementationClass="com.videogameaholic.intellij.starcoder.actions.CodeGenTabAction"/>
+        <editorActionHandler action="EditorTab" implementationClass="com.intellij.smartcoder.actions.CodeGenTabAction"/>
 
         <notificationGroup id="StarCoder" displayType="STICKY_BALLOON" isLogByDefault="true"/>
     </extensions>
     <actions>
         <group id="StarCoderActions" popup="true" text="StarCoder" description="StarCoder"
-               icon="com.videogameaholic.intellij.starcoder.StarCoderIcons.Action">
+               icon="com.intellij.smartcoder.SmartCoderIcons.Action">
             <add-to-group group-id="EditorPopupMenu"/>
-            <action class="com.videogameaholic.intellij.starcoder.actions.CodeGenPromptAction"
-                    id="com.videogameaholic.intellij.starcoder.actions.CodeGenPromptAction"
+            <action class="com.intellij.smartcoder.actions.CodeGenPromptAction"
+                    id="com.intellij.smartcoder.actions.CodeGenPromptAction"
                     text="Prompt with Selection">
                 <keyboard-shortcut first-keystroke="alt P" keymap="$default"/>
             </action>
 
-            <action class="com.videogameaholic.intellij.starcoder.actions.CodeGenInsertAllAction"
-                    id="com.videogameaholic.intellij.starcoder.actions.CodeGenInsertAllAction"
+            <action class="com.intellij.smartcoder.actions.CodeGenInsertAllAction"
+                    id="com.intellij.smartcoder.actions.CodeGenInsertAllAction"
                     text="Insert All Suggestions">
                 <keyboard-shortcut first-keystroke="alt A" keymap="$default"/>
             </action>
 
-            <action class="com.videogameaholic.intellij.starcoder.actions.CodeGenInsertLineAction"
-                    id="com.videogameaholic.intellij.starcoder.actions.CodeGenInsertLineAction"
+            <action class="com.intellij.smartcoder.actions.CodeGenInsertLineAction"
+                    id="com.intellij.smartcoder.actions.CodeGenInsertLineAction"
                     text="Insert Single Line">
                 <keyboard-shortcut first-keystroke="alt S" keymap="$default"/>
             </action>
