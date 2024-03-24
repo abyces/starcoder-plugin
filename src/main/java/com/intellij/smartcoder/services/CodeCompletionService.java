@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.Editor;
 import java.util.List;
 
 public interface CodeCompletionService {
-    String[] getCodeCompletionHints(Editor focusedEditor, CharSequence editorContents, int cursorPosition);
+    String[] getCompletionHints(Editor focusedEditor, int cursorPosition);
+    String[] getCodeCompletionHints(Editor focusedEditor, int cursorPosition);
     String replacementSuggestion (String prompt);
 }

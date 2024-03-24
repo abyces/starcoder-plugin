@@ -14,6 +14,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.NlsContexts;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.StatusBar;
@@ -36,6 +37,10 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class SmartCoderWidget extends EditorBasedWidget
@@ -50,6 +55,10 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
     private MergingUpdateQueue serviceQueue;
 
     private boolean startCodeCompletion = false;
+
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+    private ScheduledFuture<?> scheduledFuture;
 
     protected SmartCoderWidget(@NotNull Project project) {
         super(project);
@@ -192,10 +201,16 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
     @Override
     public void afterDocumentChange (@NotNull Document document) {
         if(ApplicationManager.getApplication().isDispatchThread()) {
-            EditorFactory.getInstance().editors(document)
-                    .filter(this::isFocusedEditor)
-                    .findFirst()
-                    .ifPresent(this::updateInlayHints);
+            if (scheduledFuture != null && !scheduledFuture.isDone()) {
+                scheduledFuture.cancel(true);
+            }
+
+            scheduledFuture = executor.schedule(() -> {
+                EditorFactory.getInstance().editors(document)
+                        .filter(this::isFocusedEditor)
+                        .findFirst()
+                        .ifPresent(this::updateInlayHints);
+            }, 500, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -279,13 +294,12 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
         file.putUserData(STAR_CODER_POSITION, currentPosition);
 
         CodeCompletionService codeCompletionService = ApplicationManager.getApplication().getService(CodeCompletionServiceImpl.class);
-        CharSequence editorContents = focusedEditor.getDocument().getCharsSequence();
 
         if (!startCodeCompletion)
             return;
 
         serviceQueue.queue(Update.create(focusedEditor,() -> {
-            String[] hintList = codeCompletionService.getCodeCompletionHints(focusedEditor, editorContents, currentPosition);
+            String[] hintList = codeCompletionService.getCompletionHints(focusedEditor, currentPosition);
             this.addCodeSuggestion(focusedEditor, file, currentPosition, hintList);
         }));
     }
@@ -295,27 +309,25 @@ implements StatusBarWidget.Multiframe, StatusBarWidget.IconPresentation,
             // Discard this update if the position has changed or text is now selected.
             if (suggestionPosition != focusedEditor.getCaretModel().getOffset()) {
                 System.out.println("StarCoderWidget.addCodeSuggestion -> Position changed. from: " + suggestionPosition + " to: " + focusedEditor.getCaretModel().getOffset());
-                if ((focusedEditor.getCaretModel().getOffset() - suggestionPosition) % 4 != 0) {
-                    return;
-                }
+                if (suggestionPosition != focusedEditor.getCaretModel().getOffset() - 4) {return;}
             }
             if (focusedEditor.getSelectionModel().getSelectedText() != null) {
                 System.out.println("StarCoderWidget.addCodeSuggestion -> Text selected.");
                 return;
             }
             file.putUserData(STAR_CODER_CODE_SUGGESTION, hintList);
-            file.putUserData(STAR_CODER_POSITION, suggestionPosition);
+            file.putUserData(STAR_CODER_POSITION, focusedEditor.getCaretModel().getOffset());
             InlayModel inlayModel = focusedEditor.getInlayModel();
             inlayModel.getInlineElementsInRange(0, focusedEditor.getDocument().getTextLength(), CodeGenHintRenderer.class).forEach(Disposable::dispose);
             inlayModel.getBlockElementsInRange(0, focusedEditor.getDocument().getTextLength(), CodeGenHintRenderer.class).forEach(Disposable::dispose);
             if (hintList != null && hintList.length > 0) {
                 // The first line is an inline element
                 if (hintList[0].trim().length() > 0) {
-                    inlayModel.addInlineElement(suggestionPosition, true, new CodeGenHintRenderer(hintList[0]));
+                    inlayModel.addInlineElement(focusedEditor.getCaretModel().getOffset(), true, new CodeGenHintRenderer(hintList[0]));
                 }
                 // Each additional line is a block element
                 for (int i = 1; i < hintList.length; i++) {
-                    inlayModel.addBlockElement(suggestionPosition, false, false, 0, new CodeGenHintRenderer(hintList[i]));
+                    inlayModel.addBlockElement(focusedEditor.getCaretModel().getOffset(), false, false, 0, new CodeGenHintRenderer(hintList[i]));
                 }
             }
         });

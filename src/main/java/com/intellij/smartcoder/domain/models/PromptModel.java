@@ -7,7 +7,7 @@ public enum PromptModel {
     SANTACODER ("santacoder","SantaCoder", "<fim-prefix>","<fim-suffix>","<fim-middle>", "<|endoftext|>", "<PLACEHOLDER>"),
     // Whitespace for Code Llama is intentional
     CODELLAMA ("codellama","Code Llama", "<PRE> "," <SUF>"," <MID>", "<EOT>", "<PLACEHOLDER>"),
-    DEEPSEEK ("deepseek", "DeepSeek-Coder", "<｜fim▁begin｜>", "<｜fim▁end｜>", "<｜fim▁hole｜>", "<|EOT|>", "Directly replace <FILL_ME> with correct code. Just Code, No explanation, No Other words!\ncode:\n<PLACEHOLDER>")
+    DEEPSEEK ("deepseek", "DeepSeek-Coder", "<｜fim▁begin｜>", "<｜fim▁end｜>", "<｜fim▁hole｜>", "<|end_of_sentence|>", "Directly replace <FILL_ME> with correct code. Just Code, No explanation, No Other words!\ncode:\n<PLACEHOLDER>")
     ;
 
     private final String id;
@@ -33,6 +33,10 @@ public enum PromptModel {
         return id;
     }
 
+    public String getEndTag() {
+        return endTag;
+    }
+
     public static PromptModel fromModel(String modelName) {
         return Stream.of(PromptModel.values())
                 .filter(model -> model.id.equals(modelName.toLowerCase()))
@@ -44,7 +48,7 @@ public enum PromptModel {
         if(code.contains(prefixTag) || code.contains(suffixTag) || code.contains(middleTag) || code.contains(endTag)) return "";
         String prefix = code.substring(0, fillPosition);
         String suffix = code.substring(fillPosition);
-        return metaData + prefixTag + prefix + suffixTag + suffix + middleTag;
+        return metaData + prefixTag + prefix + middleTag + suffix + suffixTag;
     }
 
     public String generateChatCompletionPrompt(String model, String code, int fillPosition) {

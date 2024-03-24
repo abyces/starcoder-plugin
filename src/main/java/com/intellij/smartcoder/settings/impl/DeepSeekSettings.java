@@ -28,7 +28,7 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
     private static final String FIM_MODEL_TAG = "FIM_TOKEN_MODEL";
     private static final String MODEL = "MODEL";
 
-    private String apiURL = "https://api.deepseek.com/v1/chat/completions";
+    private String apiURL = "http://localhost:11434/api/generate";
     private TabActionOption tabActionOption = TabActionOption.ALL;
     private float temperature = 0.5f;
     private int maxTokens = 2048;
@@ -36,7 +36,8 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
     private float frequencyPenalty = 0f;
     private float presencePenalty = 0f;
     private PromptModel fimTokenModel = PromptModel.DEEPSEEK;
-    private String model = "deepseek-coder";
+    private String model = "deepseek-coder:base";
+    private boolean stream = false;
 
     private static final DeepSeekSettings deepSeekSettingsInstance = new DeepSeekSettings();
 
@@ -186,5 +187,14 @@ public class DeepSeekSettings implements BaseModelSettings, PersistentStateCompo
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    @Override
+    public boolean isStream() {
+        return stream;
+    }
+
+    public void setStream(boolean stream) {
+        this.stream = stream;
     }
 }

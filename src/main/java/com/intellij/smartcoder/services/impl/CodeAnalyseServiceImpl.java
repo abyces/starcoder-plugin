@@ -26,11 +26,11 @@ public class CodeAnalyseServiceImpl implements CodeAnalyseService {
         if (psiFile != null) {
             PsiCodeBlock codeBlock = getEnclosingCodeBlock(focusedEditor, psiFile);
             if (codeBlock != null) {
-                // 现在你可以对 codeBlock 进行操作，例如获取其文本或类型
-                boolean isCursorAtEnd = isCursorAtEndOfScope(focusedEditor, codeBlock);
+                boolean isCursorAtEnd = isCursorAtEndOfScope(codeBlock, cursorPosition);
+                return isCursorAtEnd ? CompletionType.ONE_LINE : CompletionType.MULTI_LINE;
             }
         }
-        return null;
+        return CompletionType.MULTI_LINE;
     }
 
     /**
@@ -55,15 +55,11 @@ public class CodeAnalyseServiceImpl implements CodeAnalyseService {
         return codeBlock;
     }
 
-    private boolean isCursorAtEndOfScope(Editor editor, PsiCodeBlock codeBlock) {
+    private boolean isCursorAtEndOfScope(PsiCodeBlock codeBlock, int cursorPosition) {
         if (codeBlock == null) {
             return false;
         }
-        // 获取代码块的文本范围
         TextRange textRange = codeBlock.getTextRange();
-        // 获取光标位置
-        int cursorOffset = editor.getCaretModel().getOffset();
-        // 检查光标是否在代码块的文本范围之后
-        return cursorOffset >= textRange.getEndOffset();
+        return cursorPosition >= textRange.getEndOffset();
     }
 }
